@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jev overlays</title>
+<link rel="stylesheet" href="../shared/overlay.css">
+<style>
+  /* ---------- 01 · as good as Astra & Fable, cheaper, 400M ---------- */
+  #s1 .title { font: 700 150px/.86 var(--display); letter-spacing: -.045em; color: var(--jev); margin: -4px 0 0 -6px; }
+  #s1 .cmp { margin-top: 40px; }
+  #s1 .cmp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  #s1 .par-tag { display: inline-flex; align-items: center; gap: 10px; font: 700 28px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--jev); }
+  #s1 .par-tag svg { width: 34px; height: 34px; }
+  #s1 .bars { position: relative; display: grid; gap: 16px; --track-x: 170px; --level: 84%; }
+  #s1 .bar-row { display: grid; grid-template-columns: 150px 1fr; gap: 20px; align-items: center; }
+  #s1 .bar-name { font: 600 40px/1 var(--display); white-space: nowrap; }
+  #s1 .bar-track { position: relative; height: 44px; border-radius: 12px; background: var(--ink-2); overflow: hidden; }
+  #s1 .bar-fill { position: absolute; inset: 0 auto 0 0; width: var(--level); border-radius: 12px; background: var(--paper-2); animation: grow 1000ms var(--ease-out) var(--at) both; }
+  #s1 .bar-fill.is-jev { background: var(--jev); }
+  @keyframes grow { from { width: 0; } }
+  /* the shared finish line all three bars land on */
+  #s1 .par-line { position: absolute; top: -10px; bottom: -10px; width: 0; left: calc(var(--track-x) + (100% - var(--track-x)) * .84 - 2px); border-left: 4px dashed var(--jev); animation: drop-line 500ms var(--ease-out) var(--at) both; }
+  @keyframes drop-line { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+  #s1 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 40px; }
+  #s1 .tile { background: var(--ink-2); border: 2px solid var(--line); border-radius: 28px; padding: 26px 26px 28px; }
+  #s1 .tile .label { font-size: 26px; }
+  #s1 .tile-big { display: flex; align-items: center; gap: 10px; margin-top: 14px; font: 700 72px/1 var(--display); letter-spacing: -.035em; white-space: nowrap; }
+  #s1 .tile-big svg { width: 54px; height: 54px; flex: none; }
+  #s1 .tile-big .count { --count-dur: 1100ms; }
+  #s1 .tile-sub { display: block; margin-top: 14px; font: 500 26px/1.2 var(--mono); color: var(--muted); white-space: nowrap; }
+
+  /* ---------- 02 · model card ---------- */
+  #s2 .kv { display: grid; grid-template-columns: 210px 1fr; align-items: baseline; padding: 24px 0; border-top: 2px solid var(--line); }
+  #s2 .card-head + .kv { border-top: 0; padding-top: 4px; }
+  #s2 .kv:last-child { padding-bottom: 0; }
+  #s2 .k { font: 500 30px/1 var(--mono); color: var(--muted); white-space: nowrap; }
+  #s2 .v { font: 500 44px/1.15 var(--mono); color: var(--paper); white-space: nowrap; }
+  #s2 .v.is-jev { color: var(--jev); font-weight: 700; }
+
+  /* ---------- 03 · the next big model? it isn't ---------- */
+  #s3 .card {
+    padding-bottom: 150px;
+    animation:
+      card-in 600ms var(--ease-out) both,
+      shake 440ms linear 2.3s,
+      card-out 320ms var(--ease-in) calc(var(--dur) - 320ms) forwards;
+  }
+  @keyframes shake {
+    0%, 100% { transform: none; }
+    15% { transform: translateX(-12px) rotate(-.5deg); }
+    35% { transform: translateX(10px) rotate(.4deg); }
+    55% { transform: translateX(-6px); }
+    75% { transform: translateX(3px); }
+  }
+  #s3 .claim { font: 700 124px/1.02 var(--display); letter-spacing: -.045em; }
+  #s3 .dim { animation: dim 320ms linear var(--at) both; }
+  @keyframes dim { to { color: var(--dim); } }
+  #s3 .ln { position: relative; display: inline-block; }
+  #s3 .ln::after { content: ""; position: absolute; left: -10px; right: -10px; top: 54%; height: 14px; margin-top: -7px; border-radius: 8px; background: var(--no); transform-origin: left center; animation: strike 300ms var(--ease-out) var(--at) both; }
+  @keyframes strike { from { transform: scaleX(0); } }
+  #s3 .stamp { position: absolute; right: 56px; bottom: 44px; padding: 14px 30px 16px; border: 7px solid var(--no); border-radius: 18px; background: var(--ink); color: var(--no); font: 700 80px/1 var(--display); letter-spacing: .01em; text-transform: uppercase; white-space: nowrap; transform: rotate(-7deg); animation: stamp 440ms cubic-bezier(.2, 1.35, .4, 1) var(--at) both; }
+  @keyframes stamp { from { opacity: 0; transform: rotate(-7deg) scale(2.3); } 45% { opacity: 1; } to { opacity: 1; transform: rotate(-7deg) scale(1); } }
+
+  /* ---------- 04 · different architectures, different jobs ---------- */
+  #s4 .vs { display: grid; grid-template-columns: 1fr 104px 1fr; align-items: stretch; }
+  #s4 .side { position: relative; display: flex; flex-direction: column; align-items: center; padding: 34px 20px 28px; background: var(--ink-2); border: 2px solid var(--line); border-radius: 30px; overflow: hidden; }
+  #s4 .side::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 8px; background: var(--accent); }
+  #s4 .side.is-jev { --accent: var(--jev); }
+  #s4 .side.is-llm { --accent: var(--llm); }
+  #s4 .glyph { width: 220px; height: 130px; fill: none; stroke: var(--accent); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+  #s4 .glyph .tk { fill: var(--accent); stroke: none; transform-box: fill-box; transform-origin: center; }
+  #s4 .side-name { margin-top: 18px; font: 700 40px/1 var(--display); letter-spacing: -.02em; color: var(--accent); white-space: nowrap; }
+  #s4 .side-sub { margin-top: 14px; font: 500 26px/1 var(--mono); color: var(--muted); white-space: nowrap; }
+  #s4 .neq { align-self: center; justify-self: center; display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; background: var(--paper); }
+  #s4 .neq svg { width: 46px; height: 46px; fill: none; stroke: var(--ink); stroke-width: 5.5; stroke-linecap: round; }
+  #s4 .diffs { list-style: none; display: grid; gap: 14px; margin-top: 28px; }
+  #s4 .diffs li { display: flex; align-items: center; gap: 20px; padding: 22px 24px; background: var(--ink-2); border: 2px solid var(--line); border-radius: 22px; font: 600 34px/1.1 var(--display); letter-spacing: -.01em; white-space: nowrap; }
+  #s4 .num { flex: none; font: 700 26px/1 var(--mono); color: var(--ink); background: var(--paper); border-radius: 10px; padding: 8px 10px; }
+
+  /* ---------- 05 · Jev: one forward pass → probabilities ---------- */
+  #s5 .input { display: grid; grid-template-columns: 150px 1fr; gap: 20px; align-items: center; }
+  #s5 .doc { position: relative; height: 124px; padding: 24px 28px; display: grid; align-content: space-between; background: var(--ink-2); border: 2px solid var(--line); border-radius: 22px; overflow: hidden; }
+  #s5 .doc i { position: relative; z-index: 1; display: block; height: 14px; border-radius: 7px; background: #3a3d4b; }
+  #s5 .doc i:nth-child(1) { width: 92%; }
+  #s5 .doc i:nth-child(2) { width: 74%; }
+  #s5 .doc i:nth-child(3) { width: 56%; }
+  #s5 .wash { position: absolute; inset: 0 auto 0 0; z-index: 0; background: #2a1d14; animation: wash 1500ms linear .55s both; }
+  @keyframes wash { 0% { width: 0; opacity: 1; } 60% { width: 100%; opacity: 1; } 100% { width: 100%; opacity: 0; } }
+  #s5 .beam { position: absolute; top: 0; bottom: 0; z-index: 2; width: 6px; background: var(--jev); box-shadow: 0 0 22px 6px rgb(255 122 26 / .55); animation: scan 900ms var(--ease-in-out) .55s both; }
+  @keyframes scan { from { left: 0; opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } to { left: calc(100% - 6px); opacity: 0; } }
+  #s5 .pass { position: relative; height: 128px; display: grid; place-items: center; }
+  #s5 .pass::before { content: ""; position: absolute; left: 50%; top: 10px; bottom: 10px; width: 4px; margin-left: -2px; border-radius: 2px; background: var(--line); }
+  #s5 .pulse { position: absolute; left: 50%; top: 0; width: 24px; height: 24px; margin-left: -12px; border-radius: 50%; background: var(--jev); box-shadow: 0 0 22px 5px rgb(255 122 26 / .6); animation: travel 700ms var(--ease-in-out) 1.45s both; }
+  @keyframes travel { from { top: 0; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } to { top: calc(100% - 24px); opacity: 0; } }
+  #s5 .chip { position: relative; display: block; padding: 14px 30px; border-radius: 999px; background: var(--jev); color: var(--ink); font: 700 36px/1 var(--display); animation: flash 420ms var(--ease-out) 1.72s; }
+  @keyframes flash { 40% { transform: scale(1.12); box-shadow: 0 0 0 10px #4a2a12; } }
+  #s5 .dec-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  #s5 .decisions { display: grid; gap: 14px; }
+  #s5 .dec { display: grid; grid-template-columns: 220px 1fr 112px; gap: 20px; align-items: center; }
+  #s5 .dec-name { font: 500 30px/1 var(--mono); white-space: nowrap; }
+  #s5 .dec-track { position: relative; height: 36px; border-radius: 10px; background: var(--ink-2); overflow: hidden; }
+  #s5 .dec-fill { position: absolute; inset: 0 auto 0 0; width: var(--w); border-radius: 10px; background: var(--jev-2); animation: grow 1100ms var(--ease-out) 2.3s both; }
+  #s5 .dec:first-child .dec-fill { background: var(--jev); }
+  #s5 .dec-pct { font: 700 34px/1 var(--mono); text-align: right; white-space: nowrap; }
+  #s5 .dec-pct .count { --at: 2.3s; --count-dur: 1100ms; }
+
+  /* ---------- 06 · LLMs: token by token ---------- */
+  #s6 .passes { color: var(--llm); font-weight: 700; }
+  #s6 .passes.count { animation: passes 3500ms steps(7, start) 1s forwards; }
+  @keyframes passes { from { --num: 0; } to { --num: 7; } }
+  #s6 .gen { padding: 26px 28px 30px; min-height: 290px; background: var(--ink-2); border: 2px solid var(--line); border-radius: 26px; }
+  #s6 .gen .label { display: block; margin-bottom: 20px; }
+  #s6 .toks { display: flex; flex-wrap: wrap; gap: 14px 12px; }
+  #s6 .tok {
+    padding: 10px 16px 14px; border-radius: 14px; border: 2px solid var(--llm-3); background: var(--llm-2);
+    font: 600 56px/1 var(--display); letter-spacing: -.02em; color: var(--paper);
+    animation: tok-in 280ms var(--ease-out) var(--at) both, tok-fresh 650ms ease-out var(--at) both;
+  }
+  @keyframes tok-in { from { opacity: 0; transform: translateY(14px) scale(.9); } }
+  @keyframes tok-fresh { from { background-color: #4f5bd5; border-color: var(--llm); } }
+  #s6 .loop-row { display: grid; grid-template-columns: 170px 1fr; gap: 30px; align-items: center; margin-top: 30px; }
+  #s6 .ring { position: relative; width: 170px; height: 170px; }
+  #s6 .ring svg { position: absolute; inset: 0; fill: none; stroke: var(--llm-3); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+  #s6 .orbit { position: absolute; inset: 0; animation: orbit 500ms linear .5s 7 both; }
+  #s6 .orbit::before { content: ""; position: absolute; left: 50%; top: 4px; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; background: var(--llm); box-shadow: 0 0 16px 3px rgb(139 151 255 / .55); }
+  @keyframes orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  #s6 .core { position: absolute; inset: 40px; display: grid; place-items: center; border-radius: 50%; background: var(--llm); color: var(--ink); font: 700 30px/1 var(--display); }
+  #s6 .loop-text { display: grid; gap: 16px; }
+  #s6 .big { display: block; font: 700 54px/1.02 var(--display); letter-spacing: -.03em; color: var(--paper); white-space: nowrap; transform-origin: left center; }
+
+  /* ---------- 07 · plot twist: open source for over a year ---------- */
+  #s7 .tl { display: grid; gap: 64px; }
+  /* lives in the older node: runs from its dot (30px down) to Jev's dot, one node-height + gap below */
+  #s7 .rail { position: absolute; left: 13px; top: 30px; height: calc(100% + 64px); width: 6px; margin-left: -3px; border-radius: 3px; background: #3a3d4b; transform-origin: bottom; animation: rail 700ms var(--ease-out) .85s both; }
+  @keyframes rail { from { transform: scaleY(0); } }
+  #s7 .node { position: relative; display: grid; grid-template-columns: 26px 1fr; gap: 30px; }
+  #s7 .node-dot { width: 26px; height: 26px; margin-top: 17px; border-radius: 50%; background: var(--ink); border: 6px solid #6b6e7c; }
+  #s7 .node-dot.is-jev { border-color: var(--jev); background: var(--jev); }
+  #s7 .node-dot.is-found { animation: pop 620ms var(--ease-spring) var(--at) both, found 300ms linear 2.75s forwards; }
+  @keyframes found { to { border-color: var(--jev); } }
+  #s7 .when { display: block; font: 500 30px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 14px 0 14px; white-space: nowrap; }
+  #s7 .when.is-hot { color: var(--jev); }
+  #s7 .what { display: flex; align-items: center; gap: 18px; font: 700 56px/1.05 var(--display); letter-spacing: -.03em; white-space: nowrap; }
+  #s7 .what.is-jev { color: var(--jev); }
+  #s7 .lock { flex: none; width: 46px; height: 60px; color: #6b6e7c; animation: lock-tint 300ms linear 2.75s forwards; }
+  @keyframes lock-tint { to { color: var(--jev); } }
+  #s7 .lock .shackle { fill: none; stroke: currentColor; stroke-width: 6; stroke-linecap: round; d: path("M13 31V21A10 10 0 0 1 33 21V31"); animation: unlock 420ms var(--ease-spring) 2.7s both; }
+  /* left leg rises, right leg lifts clear of the body: the standard "unlocked" glyph */
+  @keyframes unlock { to { d: path("M13 31V13A10 10 0 0 1 33 13V17"); } }
+  #s7 .lock .body { fill: currentColor; }
+  #s7 .lock .hole { fill: var(--ink); }
+  #s7 .secret { position: relative; }
+  #s7 .redact {
+    position: absolute; inset: -6px -12px; display: grid; place-items: center; border-radius: 12px;
+    background: repeating-linear-gradient(-45deg, #2c2f3b 0 16px, #1e2029 16px 32px); border: 2px solid #3a3d4b;
+    font: 700 26px/1 var(--mono); letter-spacing: .3em; text-transform: uppercase; color: #8b8e9c;
+    animation: redact-out 520ms var(--ease-in-out) 2.55s forwards;
+  }
+  @keyframes redact-out { from { clip-path: inset(-4px -4px -4px 0); } to { clip-path: inset(-4px -4px -4px 100%); } }
+
+</style>
+</head>
+<body>
+<div class="viewport">
+<div class="stage">
+
+  <!-- 01 -->
+  <section class="scene" id="s1" data-dur="9" data-name="as-good-as-astra-and-fable"
+    data-line="Yet another model was recently unveiled and it's as good as Astra and Fable all while being cheaper, and only has 400 Million parameters.">
+    <div class="card">
+      <div class="card-head in" style="--at:.15s">
+        <span class="tag"><i class="dot"></i>New model</span>
+        <span class="tag">Just unveiled</span>
+      </div>
+      <h1 class="title in" style="--at:.3s">Jev</h1>
+
+      <div class="cmp">
+        <div class="cmp-head">
+          <span class="label in" style="--at:1.8s">As good as</span>
+          <span class="par-tag pop" style="--at:3.35s">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M5 12q5.5-6 11 0t11 0"/><path d="M5 21q5.5-6 11 0t11 0"/></svg>
+            Same level
+          </span>
+        </div>
+        <div class="bars">
+          <div class="bar-row in" style="--at:1.9s">
+            <span class="bar-name">Jev</span>
+            <span class="bar-track"><span class="bar-fill is-jev" style="--at:2s"></span></span>
+          </div>
+          <div class="bar-row in" style="--at:2.2s">
+            <span class="bar-name">Astra</span>
+            <span class="bar-track"><span class="bar-fill" style="--at:2.3s"></span></span>
+          </div>
+          <div class="bar-row in" style="--at:2.5s">
+            <span class="bar-name">Fable</span>
+            <span class="bar-track"><span class="bar-fill" style="--at:2.6s"></span></span>
+          </div>
+          <span class="par-line" style="--at:3.05s"></span>
+        </div>
+      </div>
+
+      <div class="tiles">
+        <div class="tile in" style="--at:4.4s">
+          <span class="label">Price</span>
+          <div class="tile-big">
+            <svg viewBox="0 0 48 48" fill="none" stroke="var(--jev)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M24 7v33"/><path d="M11 27l13 13 13-13"/></svg>
+            Cheaper
+          </div>
+          <span class="tile-sub">$0.042 / 1M tokens</span>
+        </div>
+        <div class="tile in" style="--at:5.8s">
+          <span class="label">Only</span>
+          <div class="tile-big"><span><span class="count" style="--to:400; --at:5.9s"></span>M</span></div>
+          <span class="tile-sub">parameters</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section class="scene" id="s2" data-dur="6" data-name="released-by-typesafe-ai"
+    data-line="Jev was released just 2 weeks ago by TypeSafe AI, a company founded by an ex-OpenAI researcher.">
+    <div class="card">
+      <div class="card-head in" style="--at:.15s">
+        <span class="tag"><i class="dot"></i>Model card</span>
+      </div>
+      <div class="kv in" style="--at:.25s">
+        <span class="k">model</span>
+        <span class="v is-jev" style="--at:.35s"><span class="type">Jev</span><i class="caret"></i></span>
+      </div>
+      <div class="kv in" style="--at:.8s">
+        <span class="k">released</span>
+        <span class="v" style="--at:.9s"><span class="type">2 weeks ago</span><i class="caret"></i></span>
+      </div>
+      <div class="kv in" style="--at:1.95s">
+        <span class="k">company</span>
+        <span class="v" style="--at:2.05s"><span class="type">TypeSafe AI</span><i class="caret"></i></span>
+      </div>
+      <div class="kv in" style="--at:2.9s">
+        <span class="k">founded by</span>
+        <span class="v" style="--at:3s"><span class="type">ex-OpenAI researcher</span><i class="caret is-last"></i></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="scene" id="s3" data-dur="3.8" data-name="next-big-model-it-isnt"
+    data-line="Although Jev seems like the next big model, it isn't.">
+    <div class="card">
+      <div class="card-head in" style="--at:.15s">
+        <span class="tag"><i class="dot"></i>Jev</span>
+      </div>
+      <p class="claim in" style="--at:.3s">
+        <span class="dim" style="--at:2.05s"><span class="ln" style="--at:2s">The next</span><br><span class="ln" style="--at:2.12s">big model?</span></span>
+      </p>
+      <span class="stamp" style="--at:2.25s">It isn’t</span>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section class="scene" id="s4" data-dur="6" data-name="different-architectures"
+    data-line="Jev and frontier LLMs have completely different architectures and are intended to do 2 different things.">
+    <div class="card">
+      <div class="vs">
+        <div class="side is-jev in" style="--at:.2s">
+          <!-- one pass: input → block → a spread of scored outputs -->
+          <svg class="glyph draw" viewBox="0 0 220 130" style="--at:.4s">
+            <path pathLength="1" d="M14 65H60"/><path pathLength="1" d="M49 54l11 11-11 11"/>
+            <path pathLength="1" d="M80 33h36q14 0 14 14v36q0 14-14 14H80q-14 0-14-14V47q0-14 14-14z"/>
+            <path pathLength="1" d="M130 65l28-41M130 65l28-14M130 65l28 14M130 65l28 41"/>
+            <path pathLength="1" d="M166 24h40M166 51h28M166 79h18M166 106h10"/>
+          </svg>
+          <span class="side-name">Jev</span>
+          <span class="side-sub fade" style="--at:3.55s">scores decisions</span>
+        </div>
+        <div class="neq pop" style="--at:1.35s">
+          <svg viewBox="0 0 48 48"><path d="M9 18h30M9 30h30M30 7L18 41"/></svg>
+        </div>
+        <div class="side is-llm in" style="--at:.55s">
+          <!-- autoregressive: output loops back in, tokens stack up -->
+          <svg class="glyph draw" viewBox="0 0 220 130" style="--at:.75s">
+            <path pathLength="1" d="M92 30h36q14 0 14 14v36q0 14-14 14H92q-14 0-14-14V44q0-14 14-14z"/>
+            <path pathLength="1" d="M142 62h34q28 0 28 27t-28 27H44q-28 0-28-27t28-27h24"/>
+            <path pathLength="1" d="M58 51l11 11-11 11"/>
+            <rect class="tk pop" style="--at:1.2s" x="152" y="10" width="14" height="14" rx="3"/>
+            <rect class="tk pop" style="--at:1.45s" x="172" y="10" width="14" height="14" rx="3"/>
+            <rect class="tk pop" style="--at:1.7s" x="192" y="10" width="14" height="14" rx="3"/>
+          </svg>
+          <span class="side-name">Frontier LLMs</span>
+          <span class="side-sub fade" style="--at:3.7s">write text</span>
+        </div>
+      </div>
+      <ol class="diffs">
+        <li class="in" style="--at:1.9s"><span class="num">01</span>completely different architectures</li>
+        <li class="in" style="--at:3.4s"><span class="num">02</span>intended to do 2 different things</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section class="scene" id="s5" data-dur="6" data-name="jev-single-forward-pass"
+    data-line="Jev scans and gives a probability to a set of decisions in a single forward pass.">
+    <div class="card">
+      <div class="card-head in" style="--at:.15s">
+        <span class="tag"><i class="dot"></i>How Jev works</span>
+        <span class="pill pop" style="--at:3.6s">1 forward pass</span>
+      </div>
+      <div class="input in" style="--at:.3s">
+        <span class="label">Input</span>
+        <div class="doc"><i></i><i></i><i></i><span class="wash"></span><span class="beam"></span></div>
+      </div>
+      <div class="pass">
+        <span class="pulse"></span>
+        <span class="in" style="--at:.5s"><span class="chip">Jev</span></span>
+      </div>
+      <div class="in" style="--at:2.15s">
+        <div class="dec-head">
+          <span class="label">Decisions</span>
+          <span class="label pop" style="--at:2.5s; color: var(--jev)">All at once</span>
+        </div>
+        <div class="decisions">
+          <div class="dec"><span class="dec-name">decision A</span><span class="dec-track"><span class="dec-fill" style="--w:64%"></span></span><span class="dec-pct"><span class="count" style="--to:64"></span>%</span></div>
+          <div class="dec"><span class="dec-name">decision B</span><span class="dec-track"><span class="dec-fill" style="--w:21%"></span></span><span class="dec-pct"><span class="count" style="--to:21"></span>%</span></div>
+          <div class="dec"><span class="dec-name">decision C</span><span class="dec-track"><span class="dec-fill" style="--w:11%"></span></span><span class="dec-pct"><span class="count" style="--to:11"></span>%</span></div>
+          <div class="dec"><span class="dec-name">decision D</span><span class="dec-track"><span class="dec-fill" style="--w:4%"></span></span><span class="dec-pct"><span class="count" style="--to:4"></span>%</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section class="scene" id="s6" data-dur="6" data-name="llm-token-by-token"
+    data-line="LLMs generate text token by token and generate a final answer one word at a time.">
+    <div class="card">
+      <div class="card-head in" style="--at:.15s">
+        <span class="tag"><i class="dot is-llm"></i>How LLMs work</span>
+        <span class="tag">Passes <b class="passes count"></b></span>
+      </div>
+      <div class="gen in" style="--at:.3s">
+        <span class="label">Output</span>
+        <div class="toks">
+          <span class="tok" style="--at:1s">The</span>
+          <span class="tok" style="--at:1.5s">best</span>
+          <span class="tok" style="--at:2s">choice</span>
+          <span class="tok" style="--at:2.5s">is</span>
+          <span class="tok" style="--at:3s">option</span>
+          <span class="tok" style="--at:3.5s">A</span>
+          <span class="tok" style="--at:4s">.</span>
+        </div>
+      </div>
+      <div class="loop-row">
+        <div class="ring in" style="--at:.45s">
+          <svg viewBox="0 0 170 170"><circle cx="85" cy="85" r="70"/><path d="M147 79l8 10 8-10"/></svg>
+          <span class="orbit"></span>
+          <span class="core">LLM</span>
+        </div>
+        <div class="loop-text">
+          <span class="label fade" style="--at:1.1s">1 forward pass per token</span>
+          <span class="big pop" style="--at:4.25s">One word at a time</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 -->
+  <section class="scene" id="s7" data-dur="6" data-name="open-source-for-over-a-year"
+    data-line="The crazy bit is that there has secretly been an open source version for over a year.">
+    <div class="card">
+      <div class="card-head in" style="--at:.15s">
+        <span class="tag"><i class="dot"></i>Plot twist</span>
+      </div>
+      <div class="tl">
+        <div class="node">
+          <span class="rail"></span>
+          <span class="node-dot is-found" style="--at:1.3s"></span>
+          <div>
+            <span class="when is-hot fade" style="--at:3.55s">Over a year ago</span>
+            <div class="what fade" style="--at:1.3s">
+              <svg class="lock" viewBox="0 0 46 60"><path class="shackle" d="M13 31V21A10 10 0 0 1 33 21V31"/><rect class="body" x="3" y="30" width="40" height="28" rx="8"/><circle class="hole" cx="23" cy="44" r="4.5"/></svg>
+              <span class="secret">Open-source version<span class="redact">Secret</span></span>
+            </div>
+          </div>
+        </div>
+        <div class="node in" style="--at:.35s">
+          <span class="node-dot is-jev"></span>
+          <div>
+            <span class="when">2 weeks ago</span>
+            <div class="what is-jev">Jev</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</div>
+<script src="../shared/overlay.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+node_modules/
+*/renders/
+tools/.bin/
+.DS_Store
+.env

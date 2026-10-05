@@ -1,0 +1,196 @@
+/* ==========================================================================
+   Shared base for @arnsv.mp4 overlay animations.
+
+   Each video folder has an index.html with a .stage of <section class="scene">
+   blocks. tools/render.mjs captures every scene as its own 1080x1920 clip.
+
+   Timing convention: `--at` on an element = seconds into its scene when that
+   element animates. `--dur` (set from data-dur) = the scene's total length.
+   ========================================================================== */
+
+@font-face { font-family: "Space Grotesk"; font-weight: 400; font-display: block; src: url("fonts/space-grotesk-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Space Grotesk"; font-weight: 500; font-display: block; src: url("fonts/space-grotesk-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Space Grotesk"; font-weight: 600; font-display: block; src: url("fonts/space-grotesk-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Space Grotesk"; font-weight: 700; font-display: block; src: url("fonts/space-grotesk-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-weight: 400; font-display: block; src: url("fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-weight: 500; font-display: block; src: url("fonts/jetbrains-mono-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-weight: 700; font-display: block; src: url("fonts/jetbrains-mono-latin-700-normal.woff2") format("woff2"); }
+
+/* Lets counters tween as real integers (see .count) */
+@property --num { syntax: "<integer>"; inherits: false; initial-value: 0; }
+
+:root {
+  /* Opaque surfaces only: anything semi-transparent at a card's edge would
+     smear into the green in the chroma-key render. */
+  --ink: #0e0f14;
+  --ink-2: #181a22;
+  --ink-3: #252833;
+  --line: #2c2f3b;
+  --paper: #f5f2ea;
+  --paper-2: #cfcbc2;
+  --muted: #9a9dab;
+  --dim: #5d606e;
+
+  /* Accents stay far from green (hue 120) so chroma keying never eats them */
+  --jev: #ff7a1a;
+  --jev-2: #8f4a1b;
+  --llm: #8b97ff;
+  --llm-2: #1f2340;
+  --llm-3: #343a6b;
+  --no: #ff4b5c;
+
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-in: cubic-bezier(.55, 0, 1, .45);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+
+  --display: "Space Grotesk", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { background: #0b0c10; }
+body { font-family: var(--display); color: var(--paper); -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
+
+/* ---- Stage --------------------------------------------------------------- */
+
+.stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; isolation: isolate; --card-top: 280px; }
+.scene { position: absolute; inset: 0; z-index: 1; display: none; }
+.scene.is-active { display: block; }
+
+/* Render mode: only the stage, at 1:1, on transparent or chroma green */
+html.is-render, html.is-render body { background: transparent; overflow: hidden; }
+html.is-render.is-keyable, html.is-render.is-keyable body { background: #00ff00; }
+html.is-render .viewport { width: 1080px; height: 1920px; }
+html.is-render .stage { transform: none; }
+
+/* ---- Card ---------------------------------------------------------------- */
+
+.card {
+  position: absolute; left: 90px; right: 90px; top: var(--card-top);
+  padding: 46px 52px 52px;
+  background: var(--ink);
+  border: 2px solid var(--line);
+  border-radius: 44px;
+  box-shadow: 0 40px 90px -20px rgb(0 0 0 / .7), 0 12px 32px rgb(0 0 0 / .35);
+  animation:
+    card-in 600ms var(--ease-out) both,
+    card-out 320ms var(--ease-in) calc(var(--dur) - 320ms) forwards;
+}
+html.is-keyable .card { box-shadow: none; }
+
+@keyframes card-in { from { opacity: 0; transform: translateY(56px) scale(.94); } }
+@keyframes card-out { to { opacity: 0; transform: translateY(-24px) scale(.97); } }
+
+.card-head { display: flex; justify-content: space-between; align-items: center; min-height: 52px; margin-bottom: 30px; }
+
+/* ---- Reveal utilities (all keyed off --at) ------------------------------- */
+
+.in   { animation: rise 560ms var(--ease-out) var(--at, 0s) both; }
+.pop  { animation: pop 620ms var(--ease-spring) var(--at, 0s) both; }
+.fade { animation: fade 420ms linear var(--at, 0s) both; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(26px); } }
+@keyframes pop  { from { opacity: 0; transform: scale(.5); } }
+@keyframes fade { from { opacity: 0; } }
+
+/* SVG line art that draws itself: give each path pathLength="1" */
+.draw path, .draw line { stroke-dasharray: 1 1; animation: draw 900ms var(--ease-out) var(--at, 0s) both; }
+@keyframes draw { from { stroke-dashoffset: 1; opacity: 0; } 12% { opacity: 1; } to { stroke-dashoffset: 0; opacity: 1; } }
+
+/* ---- Type ---------------------------------------------------------------- */
+
+.label, .tag {
+  font: 500 30px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
+}
+.tag { display: inline-flex; align-items: center; gap: 16px; }
+
+.dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: var(--jev); animation: pulse 1.6s ease-in-out infinite; }
+.dot.is-llm { background: var(--llm); }
+@keyframes pulse { 50% { transform: scale(.55); opacity: .45; } }
+
+.pill { font: 700 28px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink); background: var(--jev); border-radius: 999px; padding: 13px 20px; }
+
+/* Integer counter: <span class="count" style="--to:400"></span> */
+.count {
+  counter-reset: num var(--num);
+  font-variant-numeric: tabular-nums;
+  animation: count var(--count-dur, 1200ms) var(--ease-out) var(--at, 0s) both;
+}
+.count::before { content: counter(num); }
+@keyframes count { from { --num: 0; } to { --num: var(--to); } }
+
+/* Typewriter for monospace text. overlay.js sets --n (character count) on the
+   parent so a sibling .caret can share it. */
+.type {
+  display: inline-block; vertical-align: top; overflow: hidden; white-space: nowrap;
+  width: calc(var(--n) * 1ch);
+  animation: type calc(var(--n) * 42ms) steps(var(--n), end) var(--at, 0s) both;
+}
+@keyframes type { from { width: 0; } }
+
+.caret {
+  display: inline-block; width: .5em; height: 1em; margin-left: .12em; vertical-align: -.12em;
+  background: currentColor; visibility: hidden;
+  animation: caret-life calc(var(--n) * 42ms + 260ms) steps(1, end) var(--at, 0s);
+}
+.caret.is-last {
+  animation:
+    caret-life 1ms var(--at, 0s) forwards,
+    blink 1s steps(1, end) calc(var(--at, 0s) + var(--n) * 42ms) infinite;
+}
+@keyframes caret-life { from, to { visibility: visible; } }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ---- Preview-only backgrounds (render mode never sets these) ------------- */
+
+.stage.bg-dark  { background: #1b1c22; }
+.stage.bg-light { background: #e9e5dc; }
+.stage.bg-green { background: #00ff00; }
+.stage.bg-check { background: repeating-conic-gradient(#3b3b40 0 25%, #2b2b30 0 50%) 0 0 / 60px 60px; }
+.stage.bg-mock  { background: radial-gradient(120% 70% at 50% 82%, #4a4038 0%, #2a2522 45%, #15161a 100%); }
+.stage.bg-mock::before, .stage.bg-mock::after { content: ""; position: absolute; left: 50%; z-index: 0; transform: translateX(-50%); }
+.stage.bg-mock::before { top: 1040px; width: 380px; height: 480px; border-radius: 48% 48% 44% 44%; background: radial-gradient(circle at 45% 38%, #8c7162, #5a453b 72%); }
+.stage.bg-mock::after  { top: 1470px; width: 920px; height: 600px; border-radius: 50% 50% 0 0 / 34% 34% 0 0; background: linear-gradient(#34405a, #222a3b); }
+
+/* ---- Preview UI (never present in render mode) --------------------------- */
+
+html.is-preview body { min-height: 100vh; display: flex; gap: 32px; align-items: flex-start; justify-content: center; padding: 24px; }
+html.is-preview .viewport { --k: .4; flex: none; width: calc(1080px * var(--k)); height: calc(1920px * var(--k)); border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 1px #2a2c35, 0 30px 60px rgb(0 0 0 / .5); }
+html.is-preview .stage { transform: scale(var(--k)); transform-origin: 0 0; }
+@media (max-width: 899px) { html.is-preview body { flex-direction: column; align-items: center; padding: 16px; } }
+
+.safe { display: none; position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+.stage.show-safe .safe { display: block; }
+.safe i { position: absolute; display: flex; align-items: center; justify-content: center; font: 500 28px/1 var(--mono); font-style: normal; letter-spacing: .06em; text-transform: uppercase; color: #fff; background: rgb(255 40 80 / .28); outline: 2px dashed rgb(255 80 110 / .9); outline-offset: -2px; }
+.safe-top    { left: 0; right: 0; top: 0; height: 220px; }
+.safe-bottom { left: 0; right: 0; bottom: 0; height: 420px; }
+.safe-right  { right: 0; top: 960px; bottom: 420px; width: 130px; writing-mode: vertical-rl; }
+
+.ui { width: 400px; max-width: 100%; color: #d8d6d0; font: 400 14px/1.45 var(--display); display: grid; gap: 16px; }
+.ui header h1 { font: 700 26px/1.1 var(--display); color: var(--paper); letter-spacing: -.01em; }
+.ui header p, .ui-hint, .ui-k { font: 500 12px/1.4 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.ui header p { margin-top: 6px; }
+.ui-scenes { list-style: none; display: grid; gap: 6px; }
+.ui-scene { width: 100%; display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: start; text-align: left; padding: 10px 12px; border-radius: 12px; border: 1px solid #262833; background: #13141a; color: inherit; font: inherit; cursor: pointer; transition: background-color .15s, border-color .15s; }
+.ui-scene:hover { background: #1a1c24; }
+.ui-scene.is-on { border-color: var(--jev); background: #1d1610; }
+.ui-scene b { font: 700 13px/1.45 var(--mono); color: var(--jev); }
+.ui-scene em { font: 500 12px/1.45 var(--mono); font-style: normal; color: var(--muted); }
+.ui-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ui-row label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.ui-btn, .ui-chip { font: 600 13px/1 var(--display); color: var(--paper); background: #1c1e26; border: 1px solid #2c2f3b; border-radius: 999px; padding: 9px 14px; cursor: pointer; }
+.ui-btn.is-primary { background: var(--jev); border-color: var(--jev); color: var(--ink); min-width: 74px; }
+.ui-chip.is-on { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+.ui-scrub { flex: 1; min-width: 120px; accent-color: var(--jev); }
+.ui-clock { font: 500 12px/1 var(--mono); color: var(--muted); min-width: 104px; text-align: right; }
+.ui button:focus-visible, .ui input:focus-visible { outline: 2px solid var(--jev); outline-offset: 2px; }
+
+/* ---- Boxed render (bg=box): the clip IS the card --------------------------
+   For editors that can only lay one opaque clip over another (e.g. Instagram
+   Edits): square corners, no shadow, and the card itself doesn't move, so it
+   fills the frame from the first frame to the last. Content still animates.
+   !important because some scenes set their own card animation by #id. */
+html.is-render.is-boxed, html.is-render.is-boxed body { background: var(--ink); }
+html.is-boxed .card { border-radius: 0; border-color: var(--ink); box-shadow: none; animation: none !important; }
