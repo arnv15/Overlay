@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /* Renders every <section class="scene"> in <Video>/index.html to its own clip.
 
-     npm run render -- Jev                     all scenes, all formats
+     npm run render -- Jev                     all scenes as phone-transparent clips (the default)
      npm run render -- Jev --scenes 3,5        only those scenes
-     npm run render -- Jev --formats phone     alpha | phone | green | boxed | preview
+     npm run render -- Jev --formats alpha     other formats on request: alpha | phone | green | boxed | preview
      npm run render -- Jev --dur 4=7.5,6=5     re-time clips to how long each line really takes (s)
      npm run render -- Jev --fps 60
 
@@ -280,7 +280,7 @@ async function pool(jobs, size) {
 }
 
 function parseArgs(argv) {
-  const o = { video: null, scenes: null, formats: ['alpha', 'phone', 'green', 'boxed', 'preview'], fps: 30, durs: new Map(), parallel: 3, force: false };
+  const o = { video: null, scenes: null, formats: ['phone'], fps: 30, durs: new Map(), parallel: 3, force: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i], next = () => argv[++i];
     if (a === '--scenes') o.scenes = next().split(',').map(Number);
@@ -298,7 +298,6 @@ function parseArgs(argv) {
   }
   if (!o.video) fail('Usage: npm run render -- <VideoFolder> [--scenes 1,2] [--formats alpha,phone,green,boxed,preview] [--dur 4=7.5] [--fps 30]');
   for (const f of o.formats) if (!FORMATS[f]) fail(`Unknown format "${f}" (${Object.keys(FORMATS).join(', ')})`);
-  if (o.formats.includes('phone') && !o.formats.includes('alpha')) o.formats.push('alpha'); // phone is made from alpha
   if (!(o.fps > 0)) fail('--fps must be a positive number');
   return o;
 }

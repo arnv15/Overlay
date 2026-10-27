@@ -16,6 +16,8 @@ Every clip ends with a 0.3s exit animation. If your line is shorter than the cli
 
 ## Which file to use
 
+Default output is `renders/phone-transparent/` only. The other formats below are made only when asked for with `--formats`.
+
 | Where you edit | Use | How |
 |----------------|-----|-----|
 | **Instagram Edits** (iPhone) | `renders/phone-transparent/*.mov` | Save to Photos → in Edits tap **Overlay** → pick the clip → pinch/drag into place. It's transparent: rounded corners, shadow, your video shows around it. |

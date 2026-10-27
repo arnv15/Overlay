@@ -4,8 +4,9 @@ HTML/CSS overlay animations for Instagram Reels, rendered to transparent video c
 
 ```
 shared/          overlay.css (look + animation helpers), overlay.js (preview player + render hooks), fonts/
-tools/render.mjs captures each scene frame-by-frame → per-clip videos cropped to the card:
-                 iPhone transparent .mov (Instagram Edits), boxed .mp4, green-screen .mp4, ProRes 4444 .mov
+tools/render.mjs captures each scene frame-by-frame → one transparent iPhone .mov per clip
+                 (renders/phone-transparent/), cropped to its card, for Instagram Edits.
+                 Other formats only on request: --formats boxed,green,alpha,preview
 tools/apple-encode.swift  writes the transparent .movs with Apple's encoder (compiled automatically)
 <Video>/         one folder per video: index.html (the scenes), README.md (clip ↔ line map), renders/
 ```
